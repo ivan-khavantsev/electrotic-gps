@@ -123,6 +123,12 @@
     <Compile Include="font.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="gfxfont.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="glcdfont.c">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="i2c_master.c">
       <SubType>compile</SubType>
     </Compile>
@@ -133,12 +139,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="ssd1306.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="uart.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="uart.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main.c">
