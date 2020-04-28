@@ -1,8 +1,10 @@
-#ifndef F_CPU
+
 #define F_CPU 8000000UL
-#endif
+#define SSD1306_128_64
+
 
 #include <avr/io.h>
+#include <avr/power.h>
 #include <util/delay.h>
 #include "font.h"
 #include "uart.h"
@@ -19,13 +21,13 @@ static void testdrawcircle(void)
 	}
 }
 
-
 int main(void)
 {
+	clock_prescale_set(clock_div_1);
 	init_uart(4800);
 	i2c_init();
 	_delay_ms(10);
-	ssd1306_begin(SSD1306_SWITCHCAPVCC);
+	ssd1306_begin(SSD1306_EXTERNALVCC);
 	
     while (1) 
     {
@@ -33,4 +35,3 @@ int main(void)
 		testdrawcircle();
     }
 }
-

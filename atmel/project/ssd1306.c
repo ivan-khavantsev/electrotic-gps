@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define SSD1306_ADDRESS 0x3C
+#define SSD1306_ADDRESS (0b00111100<<1)|0
 #define SSD1306_128_64
 
 static uint8_t buffer[SSD1306_LCDHEIGHT * SSD1306_LCDWIDTH / 8];
@@ -33,7 +33,6 @@ static uint8_t buffer[SSD1306_LCDHEIGHT * SSD1306_LCDWIDTH / 8];
 
 	void ssd1306_begin(uint8_t vccstate)
 	{
-		// Init sequence
 		ssd1306_command(SSD1306_DISPLAYOFF);                    // 0xAE
 		ssd1306_command(SSD1306_SETDISPLAYCLOCKDIV);            // 0xD5
 		ssd1306_command(0x80);                                  // the suggested ratio 0x80
@@ -54,6 +53,12 @@ static uint8_t buffer[SSD1306_LCDHEIGHT * SSD1306_LCDWIDTH / 8];
 		ssd1306_command(SSD1306_SEGREMAP | 0x1);
 		ssd1306_command(SSD1306_COMSCANDEC);
 
+		#if defined SSD1306_128_32
+		ssd1306_command(SSD1306_SETCOMPINS);                    // 0xDA
+		ssd1306_command(0x02);
+		ssd1306_command(SSD1306_SETCONTRAST);                   // 0x81
+		ssd1306_command(0x8F);
+		#elif defined SSD1306_128_64
 		ssd1306_command(SSD1306_SETCOMPINS);                    // 0xDA
 		ssd1306_command(0x12);
 		ssd1306_command(SSD1306_SETCONTRAST);                   // 0x81
@@ -61,7 +66,15 @@ static uint8_t buffer[SSD1306_LCDHEIGHT * SSD1306_LCDWIDTH / 8];
 		{ ssd1306_command(0x9F); }
 		else
 		{ ssd1306_command(0xCF); }
-		
+		#elif defined SSD1306_96_16
+		ssd1306_command(SSD1306_SETCOMPINS);                    // 0xDA
+		ssd1306_command(0x2);   //ada x12
+		ssd1306_command(SSD1306_SETCONTRAST);                   // 0x81
+		if (vccstate == SSD1306_EXTERNALVCC)
+		{ ssd1306_command(0x10); }
+		else
+		{ ssd1306_command(0xAF); }
+		#endif
 
 		ssd1306_command(SSD1306_SETPRECHARGE);                  // 0xd9
 		if (vccstate == SSD1306_EXTERNALVCC)
@@ -75,7 +88,7 @@ static uint8_t buffer[SSD1306_LCDHEIGHT * SSD1306_LCDWIDTH / 8];
 
 		ssd1306_command(SSD1306_DEACTIVATE_SCROLL);
 
-		ssd1306_command(SSD1306_DISPLAYON);
+		ssd1306_command(SSD1306_DISPLAYON);//--turn on oled panel
 	}
 
 void display(void)

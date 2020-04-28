@@ -23,19 +23,20 @@
 
 #include "i2c_master.h"
 
-#define F_SCL 100000UL // SCL frequency
+#define F_SCL 20000UL // SCL frequency
 #define Prescaler 1
 #define TWBR_val ((((F_CPU / F_SCL) / Prescaler) - 16 ) / 2)
 
 void i2c_init(void)
 {
 	TWBR = (uint8_t)TWBR_val;
+	TWSR = 0;
 }
 
 uint8_t i2c_start(uint8_t address)
 {
 	// reset TWI control register
-	TWCR = 0;
+	//TWCR = 0;
 	// transmit START condition 
 	TWCR = (1<<TWINT) | (1<<TWSTA) | (1<<TWEN);
 	// wait for end of transmission
