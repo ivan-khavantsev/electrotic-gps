@@ -1,5 +1,5 @@
 
-#define F_CPU 8000000UL
+#define F_CPU 16000000UL
 #define SSD1306_128_64
 
 
