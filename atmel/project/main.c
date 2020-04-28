@@ -17,7 +17,7 @@ static void testdrawcircle(void)
 	{
 		drawCircle(128/2, 64/2, i, WHITE);
 		display();
-		_delay_ms(1);
+		_delay_ms(100);
 	}
 }
 
@@ -33,5 +33,6 @@ int main(void)
     {
 		uart_putc(123);
 		testdrawcircle();
+		clearDisplay();
     }
 }
