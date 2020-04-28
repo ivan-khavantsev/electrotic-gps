@@ -3,6 +3,20 @@
 #include <string.h>
 #include <stdlib.h>
 
+#ifndef _swap_int16_t
+#define _swap_int16_t(a, b) { int16_t t = a; a = b; b = t; }
+#endif
+
+#ifndef pgm_read_byte
+#define pgm_read_byte(addr) (*(const unsigned char *)(addr))
+#endif
+#ifndef pgm_read_word
+#define pgm_read_word(addr) (*(const unsigned short *)(addr))
+#endif
+#ifndef pgm_read_dword
+#define pgm_read_dword(addr) (*(const unsigned long *)(addr))
+#endif
+
 #define SSD1306_ADDRESS (0b00111100<<1)|0
 #define SSD1306_128_64
 
@@ -149,5 +163,84 @@ void drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
 		drawPixel(x0 - y, y0 + x, color);
 		drawPixel(x0 + y, y0 - x, color);
 		drawPixel(x0 - y, y0 - x, color);
+	}
+}
+
+// Bresenham's algorithm - thx wikpedia
+void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color) 
+{
+	int16_t steep = abs(y1 - y0) > abs(x1 - x0);
+	if (steep) {
+		_swap_int16_t(x0, y0);
+		_swap_int16_t(x1, y1);
+	}
+
+	if (x0 > x1) {
+		_swap_int16_t(x0, x1);
+		_swap_int16_t(y0, y1);
+	}
+
+	int16_t dx, dy;
+	dx = x1 - x0;
+	dy = abs(y1 - y0);
+
+	int16_t err = dx / 2;
+	int16_t ystep;
+
+	if (y0 < y1) {
+		ystep = 1;
+		} else {
+		ystep = -1;
+	}
+
+	for (; x0<=x1; x0++) {
+		if (steep) {
+			drawPixel(y0, x0, color);
+			} else {
+			drawPixel(x0, y0, color);
+		}
+		err -= dy;
+		if (err < 0) {
+			y0 += ystep;
+			err += dx;
+		}
+	}
+}
+
+// Draw a PROGMEM-resident 1-bit image at the specified (x,y) position,
+// using the specified foreground color (unset bits are transparent).
+void drawBitmap(int16_t x, int16_t y, const uint8_t bitmap[], int16_t w, int16_t h, uint16_t color) 
+{
+	int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
+	uint8_t byte = 0;
+
+	for(int16_t j=0; j<h; j++, y++) {
+		for(int16_t i=0; i<w; i++) {
+			if(i & 7) byte <<= 1;
+			else      byte   = pgm_read_byte(&bitmap[j * byteWidth + i / 8]);
+			if(byte & 0x80) drawPixel(x+i, y, color);
+		}
+	}
+}
+
+// Draw PROGMEM-resident XBitMap Files (*.xbm), exported from GIMP,
+// Usage: Export from GIMP to *.xbm, rename *.xbm to *.c and open in editor.
+// C Array can be directly used with this function.
+// There is no RAM-resident version of this function; if generating bitmaps
+// in RAM, use the format defined by drawBitmap() and call that instead.
+void drawXBitmap(int16_t x, int16_t y, const uint8_t bitmap[], int16_t w, int16_t h, uint16_t color) 
+{
+	int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
+	uint8_t byte = 0;
+
+	//startWrite();
+	for(int16_t j=0; j<h; j++, y++) {
+		for(int16_t i=0; i<w; i++ ) {
+			if(i & 7) byte >>= 1;
+			else      byte   = pgm_read_byte(&bitmap[j * byteWidth + i / 8]);
+			// Nearly identical to drawBitmap(), only the bit order
+			// is reversed here (left-to-right = LSB to MSB):
+			if(byte & 0x01) drawPixel(x+i, y, color);
+		}
 	}
 }
