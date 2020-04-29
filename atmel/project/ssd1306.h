@@ -71,8 +71,11 @@ void display(void);
 void clearDisplay(void);
 void drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
 void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
+void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
+void drawFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
 void drawBitmap(int16_t x, int16_t y, const uint8_t bitmap[], int16_t w, int16_t h, uint16_t color);
 void drawXBitmap(int16_t x, int16_t y, const uint8_t bitmap[], int16_t w, int16_t h, uint16_t color);
+void drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg, uint8_t size);
 void ssd1306_command(uint8_t c);
 
 

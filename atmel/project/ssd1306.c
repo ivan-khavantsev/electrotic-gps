@@ -2,6 +2,8 @@
 #include "i2c_master.h"
 #include <string.h>
 #include <stdlib.h>
+#include "gfxfont.h"
+#include <avr/pgmspace.h>
 
 #ifndef _swap_int16_t
 #define _swap_int16_t(a, b) { int16_t t = a; a = b; b = t; }
@@ -213,7 +215,6 @@ void drawBitmap(int16_t x, int16_t y, const uint8_t bitmap[], int16_t w, int16_t
 {
 	int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
 	uint8_t byte = 0;
-
 	for(int16_t j=0; j<h; j++, y++) {
 		for(int16_t i=0; i<w; i++) {
 			if(i & 7) byte <<= 1;
@@ -232,8 +233,6 @@ void drawXBitmap(int16_t x, int16_t y, const uint8_t bitmap[], int16_t w, int16_
 {
 	int16_t byteWidth = (w + 7) / 8; // Bitmap scanline pad = whole byte
 	uint8_t byte = 0;
-
-	//startWrite();
 	for(int16_t j=0; j<h; j++, y++) {
 		for(int16_t i=0; i<w; i++ ) {
 			if(i & 7) byte >>= 1;
@@ -243,4 +242,47 @@ void drawXBitmap(int16_t x, int16_t y, const uint8_t bitmap[], int16_t w, int16_
 			if(byte & 0x01) drawPixel(x+i, y, color);
 		}
 	}
+}
+
+// (x,y) is topmost point; if unsure, calling function
+// should sort endpoints or call drawLine() instead
+void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) 
+{
+    // Update in subclasses if desired!
+    drawLine(x, y, x, y+h-1, color);
+}
+
+void drawFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) 
+{
+	for (int16_t i=x; i<x+w; i++) {
+		drawFastVLine(i, y, h, color);
+	}
+}
+
+void drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg, uint8_t size) 
+{
+		if((x >= SSD1306_LCDWIDTH)            || // Clip right
+		(y >= SSD1306_LCDWIDTH)           || // Clip bottom
+		((x + 6 * size - 1) < 0) || // Clip left
+		((y + 8 * size - 1) < 0))   // Clip top
+		return;
+
+		//if(!_cp437 && (c >= 176)) c++; // Handle 'classic' charset behavior
+
+		for(int8_t i=0; i<5; i++ ) { // Char bitmap = 5 columns
+			uint8_t line = pgm_read_byte(&font[c * 5 + i]);
+			for(int8_t j=0; j<8; j++, line >>= 1) {
+				if(line & 1) {
+					if(size == 1)
+					drawPixel(x+i, y+j, color);
+					else
+					drawFillRect(x+i*size, y+j*size, size, size, color);
+					} else if(bg != color) {
+					if(size == 1)
+					drawPixel(x+i, y+j, bg);
+					else
+					drawFillRect(x+i*size, y+j*size, size, size, bg);
+				}
+			}
+		}
 }
