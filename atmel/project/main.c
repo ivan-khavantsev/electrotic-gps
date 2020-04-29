@@ -143,6 +143,21 @@ static void testdrawbitmap(void)
 	display();
 }
 
+void test(){
+	testdrawbitmap();
+	_delay_ms(3000);
+	testdrawchar();
+	_delay_ms(1000);
+	clearDisplay();
+	testdrawchar();
+	_delay_ms(3000);
+	testdrawlines();
+	_delay_ms(2000);
+	testdrawcircle();
+	_delay_ms(2000);
+	clearDisplay();
+}
+
 int main(void)
 {
 	clock_prescale_set(clock_div_1);
@@ -153,17 +168,6 @@ int main(void)
 	
     while (1) 
     {
-		testdrawbitmap();
-		_delay_ms(3000);
-		testdrawchar();
-		_delay_ms(1000);
-		clearDisplay();
-		testdrawchar();
-		_delay_ms(3000);
-		testdrawlines();
-		_delay_ms(2000);
-		testdrawcircle();
-		_delay_ms(2000);
-		clearDisplay();
+		test();
     }
 }
