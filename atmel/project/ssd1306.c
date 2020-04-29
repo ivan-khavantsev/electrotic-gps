@@ -23,6 +23,10 @@
 #define SSD1306_128_64
 
 static uint8_t buffer[SSD1306_LCDHEIGHT * SSD1306_LCDWIDTH / 8];
+
+int cursor_x = 0;
+int cursor_y = 0;
+
 #define ssd1306_swap(a, b) { int16_t t = a; a = b; b = t; }
 	
 	void drawPixel(int16_t x, int16_t y, uint16_t color)
@@ -130,6 +134,8 @@ void display(void)
 void clearDisplay(void)
 {
 	memset(buffer, 0, (SSD1306_LCDWIDTH*SSD1306_LCDHEIGHT/8));
+	cursor_x = 0;
+	cursor_y = 0;
 }
 
 
@@ -285,4 +291,29 @@ void drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg
 				}
 			}
 		}
+}
+
+
+
+void print(unsigned char c){
+	if(cursor_y > 64-8){
+		clearDisplay();
+		cursor_x = 0;
+		cursor_y = 0;
+	}
+	
+	if(c != 13 && c != '\n'){
+		drawChar(cursor_x, cursor_y, c, WHITE, WHITE, 1);	
+		cursor_x += 6;
+	} 
+	if(c == '\n')
+	{
+		cursor_x = 0;
+		cursor_y += 8;
+	}
+	
+	if(cursor_x > 128-6){
+		cursor_x = 0;
+		cursor_y += 8;
+	}
 }
