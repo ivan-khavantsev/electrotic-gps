@@ -1,5 +1,5 @@
 
-#define F_CPU 16000000UL
+#define F_CPU 8000000UL
 #define SSD1306_128_64
 
 
@@ -150,6 +150,7 @@ void test(){
 	_delay_ms(3000);
 	testdrawlines();
 	_delay_ms(2000);
+	clearDisplay();
 	testdrawcircle();
 	_delay_ms(2000);
 	clearDisplay();
@@ -210,13 +211,13 @@ int main(void)
 	sei();
 	i2c_init();
 	_delay_ms(10);
-	ssd1306_begin(SSD1306_EXTERNALVCC);
-	drawChar(0,0,'T',WHITE,WHITE,1);
-	display();
+	ssd1306_begin(SSD1306_SWITCHCAPVCC);
 	
 	int count = 0;
     while (1) 
     {
+		test();
+		continue;
 		
 		 unsigned char received = serialRead();
 		 uart_putc(received);
@@ -233,6 +234,6 @@ int main(void)
 			count = 0; 
 		 }
 			
-		//test();
+		
     }
 }
