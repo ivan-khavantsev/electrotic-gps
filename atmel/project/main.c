@@ -214,10 +214,12 @@ int main(void)
 	ssd1306_begin(SSD1306_SWITCHCAPVCC);
 	
 	int count = 0;
+	
+	//test();
+	
     while (1) 
     {
-		test();
-		continue;
+		
 		
 		 unsigned char received = serialRead();
 		 uart_putc(received);
