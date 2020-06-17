@@ -317,3 +317,11 @@ void print(unsigned char c){
 		cursor_y += 8;
 	}
 }
+
+void printString(char * text){
+	size_t length = strlen(text);
+	size_t i = 0;
+	for (; i < length; i++) {
+		print(text[i]);
+	}
+}

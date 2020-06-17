@@ -50,6 +50,17 @@ char serialRead()
 	return c;
 }
 
+unsigned char command_buffer[rx_buffer_size];
+volatile unsigned char command_buffer_position=0;
+
+void handleCommand(){
+	if(strncmp("$GPRMC", (char *)command_buffer, 6) == 0){
+		clearDisplayBuffer();
+		printString((char *)command_buffer);
+		display();
+	}
+}
+
 int main(void)
 {
 	clock_prescale_set(clock_div_1);
@@ -59,21 +70,17 @@ int main(void)
 	_delay_ms(10);
 	ssd1306_begin(SSD1306_SWITCHCAPVCC);
 	
-	int count = 0;
     while (1) 
     {
 		 unsigned char received = serialRead();
-		 count++;
-		 print(received);
+		 
+		 command_buffer[command_buffer_position] = received;
+		 command_buffer_position++;
 		 if(received == '\n'){
-			display();
-			clearDisplayBuffer();
-			count = 0;
+			handleCommand(); // Обрабатываем команду
+			memset(command_buffer, 0, rx_buffer_size); // Очищаем буфер комманды
+			command_buffer_position = 0; // Возвращаем указатель вначало
 		 }
-		  
-		 if(count >= 74){
-			display();
-			count = 0; 
-		 }
+
     }
 }
