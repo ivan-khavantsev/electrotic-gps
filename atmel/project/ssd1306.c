@@ -131,7 +131,7 @@ void display(void)
 }
 
 // clear everything
-void clearDisplay(void)
+void clearDisplayBuffer(void)
 {
 	memset(buffer, 0, (SSD1306_LCDWIDTH*SSD1306_LCDHEIGHT/8));
 	cursor_x = 0;
@@ -297,7 +297,7 @@ void drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg
 
 void print(unsigned char c){
 	if(cursor_y > 64-8){
-		clearDisplay();
+		clearDisplayBuffer();
 		cursor_x = 0;
 		cursor_y = 0;
 	}
